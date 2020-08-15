@@ -1,25 +1,37 @@
 package com.github.nnnnusui.plotter
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.StandardRoute
+import com.github.nnnnusui.plotter.repository.Repository
 
-object Router {
-  val route =
-    pathSingleSlash {
-      get { index() }
+import scala.concurrent.ExecutionContextExecutor
+
+trait Router {
+  implicit val _dispatcher: ExecutionContextExecutor
+  val repositoryImpl: Repository
+  trait HasRepository {
+    val repository: Repository = repositoryImpl
+  }
+  trait HasDispatcher {
+    implicit val dispatcher: ExecutionContextExecutor = _dispatcher
+  }
+
+  object Word extends router.Word with repository.Word with HasRepository with HasDispatcher
+
+  lazy val rest =
+    pathPrefix("rest") {
+      pathEndOrSingleSlash {
+        get { complete("version info") }
+      } ~
+      pathPrefix("1") {
+        pathEndOrSingleSlash {
+          get { complete("available") }
+        } ~
+        Word.route
+      }
     }
-
-  def index(): StandardRoute = complete(
-    HttpResponse(
-      entity = HttpEntity(
-        ContentTypes.`text/html(UTF-8)`,
-        <html>
-          <body>
-            <h1>Welcome to <i>akka-http</i>!</h1>
-          </body>
-        </html>.toString
-      )
-    )
-  )
+  lazy val route =
+    pathSingleSlash {
+      get { getFromResource("index.html") }
+    } ~
+    rest
 }
