@@ -11,11 +11,16 @@ trait Router {
   trait HasRepository {
     val repository: Repository = repositoryImpl
   }
-  trait HasDispatcher {
+  trait HasDispatcher extends UsesDispatcher {
     implicit val dispatcher: ExecutionContextExecutor = _dispatcher
   }
 
-  object Word extends router.Word with repository.Word with HasRepository with HasDispatcher
+  object Word
+    extends usecase.Word
+    with repository.Word
+    with router.Word
+    with HasRepository
+    with HasDispatcher
 
   lazy val rest =
     pathPrefix("rest") {
