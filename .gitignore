@@ -8,3 +8,6 @@ target
 *.iws
 .idea
 out
+
+#alpakka
+tmp
