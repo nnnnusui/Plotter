@@ -35,11 +35,13 @@ trait Word extends SprayJsonSupport with DefaultJsonProtocol{
             create(Input.Create(value))
           }
         }
-      } //~
-//      path(IntNumber) { id =>
-//        get {
-//          complete(getById(id))
-//        } ~
+      } ~
+      path(IntNumber) { id =>
+        get {
+          onSuccess(use(Input.GetById(id))) {result=>
+            complete(result)
+          }
+        } //~
 //        put {
 //          entity(as[Entity]) { word =>
 //            updatePost(id, word.value)

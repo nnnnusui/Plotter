@@ -12,6 +12,8 @@ trait Word {
   this: Repository with UsesDispatcher =>
   def use(input: Input.GetAll): Future[Output.GetAll] =
     getAll.map(it=> Output.GetAll(it.map(it=> (it.id, it.value))))
+  def use(input: Input.GetById): Future[Option[Output.GetById]] =
+    getById(input.id).map(it=> it.map(it=> Output.GetById(it.id, it.value)))
   def use(input: Input.Create): Future[Output.Create] =
     create(Entity(0, input.value)).map(it=> Output.Create(it))
 }
