@@ -41,23 +41,28 @@ trait Word extends SprayJsonSupport with DefaultJsonProtocol{
           onSuccess(use(Input.GetById(id))) {result=>
             complete(result)
           }
-        } //~
-//        put {
-//          entity(as[Entity]) { word =>
-//            updatePost(id, word.value)
-//          } ~
-//          formFields("value") { value =>
-//            updatePost(id, value)
-//          }
-//        } ~ MethodDirectives.delete {
-//          complete {
-//            delete(id).map { result => HttpResponse(entity = "dog has been deleted successfully") }
-//          }
-//        }
-//      }
+        } ~
+        put {
+          entity(as[Input.Update]) { input =>
+            update(input)
+          } ~
+          formFields("value") { value =>
+            update(Input.Update(id, value))
+          }
+        } ~
+        MethodDirectives.delete {
+          onSuccess(use(Input.Delete(id))) {result=>
+            complete(result)
+          }
+        }
       }
+    }
 
   def create(input: Input.Create) =
+    onSuccess(use(input)) {result=>
+      complete(result)
+    }
+  def update(input: Input.Update) =
     onSuccess(use(input)) {result=>
       complete(result)
     }

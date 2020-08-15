@@ -16,4 +16,8 @@ trait Word {
     getById(input.id).map(it=> it.map(it=> Output.GetById(it.id, it.value)))
   def use(input: Input.Create): Future[Output.Create] =
     create(Entity(0, input.value)).map(it=> Output.Create(it))
+  def use(input: Input.Update): Future[Output.Update] =
+    update(Entity(input.id, input.value)).map(it=> Output.Update(it))
+  def use(input: Input.Delete): Future[Output.Delete] =
+    delete(input.id).map(it=> Output.Delete(it))
 }
