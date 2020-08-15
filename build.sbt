@@ -11,6 +11,14 @@ libraryDependencies ++= Seq(
 )
 
 // Akka-Http
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.26"
-libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.1.12"
-libraryDependencies += "com.typesafe.akka" %% "akka-http-xml" % "10.1.12"
+val AkkaVersion = "2.5.31"
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+  "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "2.0.1",
+  "com.typesafe.akka" %% "akka-http-spray-json" % "10.2.0",
+  "com.typesafe.akka" %% "akka-http" % "10.2.0",
+  "com.typesafe.akka" %% "akka-http-xml" % "10.2.0"
+)
+
+// https://mvnrepository.com/artifact/com.h2database/h2
+libraryDependencies += "com.h2database" % "h2" % "1.4.200"
