@@ -1,7 +1,7 @@
 package com.github.nnnnusui.plotter.repository
 
 import com.github.nnnnusui.plotter.entity.{Word => Entity}
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.Future
 
@@ -9,13 +9,13 @@ trait Word extends UsesRepository with DefaultJsonProtocol {
   import repository._
   import profile.api._
 
-  class Word(tag: Tag) extends Table[Entity](tag, "word"){
+  class TableInfo(tag: Tag) extends Table[Entity](tag, "word"){
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def value = column[String]("value")
     def * = (id, value) <>(Entity.tupled, Entity.unapply)
   }
 
-  protected val tableQuery = TableQuery[Word]
+  protected val tableQuery = TableQuery[TableInfo]
   protected def tableAutoInc = tableQuery returning tableQuery.map(_.id)
   def create(entity: Entity): Future[Int] = db.run{
     tableAutoInc += entity

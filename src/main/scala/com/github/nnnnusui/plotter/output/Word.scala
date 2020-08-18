@@ -2,7 +2,6 @@ package com.github.nnnnusui.plotter.output
 
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-
 sealed trait Word
 object Word extends DefaultJsonProtocol {
   case class GetAll(value: Seq[(Int, String)]) extends Word

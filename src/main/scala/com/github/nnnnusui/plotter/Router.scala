@@ -1,14 +1,14 @@
 package com.github.nnnnusui.plotter
 
 import akka.http.scaladsl.server.Directives._
-import com.github.nnnnusui.plotter.repository.Repository
+import com.github.nnnnusui.plotter.repository.{Repository, UsesRepository}
 
 import scala.concurrent.ExecutionContextExecutor
 
 trait Router {
   implicit val _dispatcher: ExecutionContextExecutor
   val repositoryImpl: Repository
-  trait HasRepository {
+  trait HasRepository extends UsesRepository {
     val repository: Repository = repositoryImpl
   }
   trait HasDispatcher extends UsesDispatcher {

@@ -1,20 +1,13 @@
 package com.github.nnnnusui.plotter.router
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model.HttpResponse
-import com.github.nnnnusui.plotter.repository.{Word => Repository}
-import com.github.nnnnusui.plotter.entity.{Word => Entity}
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.directives.MethodDirectives
 import com.github.nnnnusui.plotter.input.{Word => Input}
 import com.github.nnnnusui.plotter.output.{Word => Output}
 import com.github.nnnnusui.plotter.usecase.{Word => UseCase}
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.StandardRoute
-import akka.http.scaladsl.server.directives.MethodDirectives
-import spray.json.DefaultJsonProtocol
-
-trait Word extends SprayJsonSupport with DefaultJsonProtocol{
+trait Word extends SprayJsonSupport{
   this: UseCase =>
   import Input.JsonFormat._
   import Output.JsonFormat._
@@ -22,11 +15,7 @@ trait Word extends SprayJsonSupport with DefaultJsonProtocol{
   val route =
     pathPrefix("word") {
       pathEnd {
-        get {
-          onSuccess(use(Input.GetAll())) {result=>
-            complete(result)
-          }
-        } ~
+        get(getAll()) ~
         post {
           entity(as[Input.Create]) { input =>
             create(input)
@@ -37,11 +26,7 @@ trait Word extends SprayJsonSupport with DefaultJsonProtocol{
         }
       } ~
       path(IntNumber) { id =>
-        get {
-          onSuccess(use(Input.GetById(id))) {result=>
-            complete(result)
-          }
-        } ~
+        get(getById(id)) ~
         put {
           entity(as[Input.Update]) { input =>
             update(input)
@@ -50,20 +35,28 @@ trait Word extends SprayJsonSupport with DefaultJsonProtocol{
             update(Input.Update(id, value))
           }
         } ~
-        MethodDirectives.delete {
-          onSuccess(use(Input.Delete(id))) {result=>
-            complete(result)
-          }
-        }
+        MethodDirectives.delete(delete(id))
       }
     }
 
+  def getAll() =
+    onSuccess(use(Input.GetAll())) {result=>
+      complete(result)
+    }
+  def getById(id: Int) =
+    onSuccess(use(Input.GetById(id))) {result=>
+      complete(result)
+    }
   def create(input: Input.Create) =
     onSuccess(use(input)) {result=>
       complete(result)
     }
   def update(input: Input.Update) =
     onSuccess(use(input)) {result=>
+      complete(result)
+    }
+  def delete(id: Int) =
+    onSuccess(use(Input.Delete(id))) {result=>
       complete(result)
     }
 }
