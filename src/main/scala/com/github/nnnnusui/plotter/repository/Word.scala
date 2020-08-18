@@ -11,8 +11,7 @@ class Word(implicit val usesDatabase: UsesDatabase) extends DefaultJsonProtocol 
 
   class TableInfo(tag: Tag) extends Table[Entity](tag, "word"){
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    def value = column[String]("value")
-    def * = (id, value) <>(Entity.tupled, Entity.unapply)
+    def * = (id) <>(Entity.apply, Entity.unapply)
   }
 
   protected val tableQuery = TableQuery[TableInfo]
