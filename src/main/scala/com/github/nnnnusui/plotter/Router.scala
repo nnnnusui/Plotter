@@ -1,28 +1,17 @@
 package com.github.nnnnusui.plotter
 
 import akka.http.scaladsl.server.Directives._
-import com.github.nnnnusui.plotter.repository.{Repository, UsesRepository}
+import com.github.nnnnusui.plotter.repository.UsesDatabase
 
 import scala.concurrent.ExecutionContextExecutor
 
-trait Router {
-  implicit val _dispatcher: ExecutionContextExecutor
-  val repositoryImpl: Repository
-  trait HasRepository extends UsesRepository {
-    val repository: Repository = repositoryImpl
-  }
-  trait HasDispatcher extends UsesDispatcher {
-    implicit val dispatcher: ExecutionContextExecutor = _dispatcher
-  }
+class Router( implicit val dispatcher: ExecutionContextExecutor
+             ,implicit val repositoryImpl: UsesDatabase) {
 
-  object Word
-    extends usecase.Word
-    with repository.Word
-    with router.Word
-    with HasRepository
-    with HasDispatcher
+  val word = new router.Word
+  while(!word.repository.ddl.isCompleted){}
 
-  lazy val rest =
+  val rest =
     pathPrefix("rest") {
       pathEndOrSingleSlash {
         get { complete("version info") }
@@ -31,10 +20,10 @@ trait Router {
         pathEndOrSingleSlash {
           get { complete("available") }
         } ~
-        Word.route
+        word.route
       }
     }
-  lazy val route =
+  val route =
     pathSingleSlash {
       get { getFromResource("index.html") }
     } ~

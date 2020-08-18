@@ -5,16 +5,22 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.directives.MethodDirectives
 import com.github.nnnnusui.plotter.input.{Word => Input}
 import com.github.nnnnusui.plotter.output.{Word => Output}
+import com.github.nnnnusui.plotter.repository.UsesDatabase
+import com.github.nnnnusui.plotter.repository.{Word => Repository}
 import com.github.nnnnusui.plotter.usecase.{Word => UseCase}
 
-trait Word extends SprayJsonSupport{
-  this: UseCase =>
+import scala.concurrent.ExecutionContext
+
+class Word(implicit val context: ExecutionContext, implicit val usesDatabase: UsesDatabase) extends SprayJsonSupport{
   import Input.JsonFormat._
   import Output.JsonFormat._
+  val repository = new Repository()
+  val useCase = new UseCase(repository)
+  import useCase.use
 
   val route =
     pathPrefix("word") {
-      pathEnd {
+      pathEndOrSingleSlash {
         get(getAll()) ~
         post {
           entity(as[Input.Create]) { input =>
@@ -25,17 +31,19 @@ trait Word extends SprayJsonSupport{
           }
         }
       } ~
-      path(IntNumber) { id =>
-        get(getById(id)) ~
-        put {
-          entity(as[Input.Update]) { input =>
-            update(input)
+      pathPrefix(IntNumber) { id =>
+        pathEndOrSingleSlash {
+          get(getById(id)) ~
+          put {
+            entity(as[Input.Update]) { input =>
+              update(input)
+            } ~
+            formFields("value") { value =>
+              update(Input.Update(id, value))
+            }
           } ~
-          formFields("value") { value =>
-            update(Input.Update(id, value))
-          }
-        } ~
-        MethodDirectives.delete(delete(id))
+          MethodDirectives.delete(delete(id))
+        }
       }
     }
 

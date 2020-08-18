@@ -5,8 +5,8 @@ import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.Future
 
-trait Word extends UsesRepository with DefaultJsonProtocol {
-  import repository._
+class Word(implicit val usesDatabase: UsesDatabase) extends DefaultJsonProtocol {
+  import usesDatabase._
   import profile.api._
 
   class TableInfo(tag: Tag) extends Table[Entity](tag, "word"){

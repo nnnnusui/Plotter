@@ -3,9 +3,8 @@ package com.github.nnnnusui.plotter
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import com.github.nnnnusui.plotter.repository.Repository
+import com.github.nnnnusui.plotter.repository.UsesDatabase
 
-import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
 object Plotter extends App {
@@ -14,11 +13,8 @@ object Plotter extends App {
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
 
-  val router = new Router {
-    override implicit val _dispatcher: ExecutionContextExecutor = executionContext
-    override val repositoryImpl: Repository = new H2Repository {}
-  }
-  while(!router.Word.ddl.isCompleted){}
+  implicit val repositoryImpl: UsesDatabase = H2Database
+  val router = new Router
 
   val bindingFuture = Http().newServerAt("localhost", 8080).bindFlow(router.route)
   system.registerOnTermination(() => router.repositoryImpl.session.close())
