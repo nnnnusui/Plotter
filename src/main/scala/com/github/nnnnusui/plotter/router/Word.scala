@@ -18,6 +18,8 @@ class Word(implicit val context: ExecutionContext, implicit val usesDatabase: Us
   val useCase = new UseCase(repository)
   import useCase.use
 
+  val alias = new Alias
+
   val route =
     pathPrefix("word") {
       pathEndOrSingleSlash {
@@ -43,7 +45,8 @@ class Word(implicit val context: ExecutionContext, implicit val usesDatabase: Us
             }
           } ~
           MethodDirectives.delete(delete(id))
-        }
+        } ~
+        alias.route(id)
       }
     }
 

@@ -9,6 +9,7 @@ class Router( implicit val dispatcher: ExecutionContextExecutor
              ,implicit val repositoryImpl: UsesDatabase) {
 
   val word = new router.Word
+  while(!word.alias.repository.ddl.isCompleted){}
   while(!word.repository.ddl.isCompleted){}
 
   val rest =
